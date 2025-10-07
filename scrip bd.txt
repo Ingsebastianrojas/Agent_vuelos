@@ -1,0 +1,210 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema bd_vuelos
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema bd_vuelos
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `bd_vuelos` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
+-- -----------------------------------------------------
+-- Schema bd_1
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema bd_1
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `bd_1` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
+USE `bd_vuelos` ;
+
+-- -----------------------------------------------------
+-- Table `bd_vuelos`.`airlines`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd_vuelos`.`airlines` (
+  `id` CHAR(36) NOT NULL DEFAULT uuid(),
+  `code` VARCHAR(8) NOT NULL,
+  `name` TEXT NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `code` (`code` ASC) VISIBLE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `bd_vuelos`.`conversations`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd_vuelos`.`conversations` (
+  `id` CHAR(36) NOT NULL DEFAULT uuid(),
+  `session_id` TEXT NULL DEFAULT NULL,
+  `user_id` CHAR(36) NULL DEFAULT NULL,
+  `message` TEXT NULL DEFAULT NULL,
+  `intent` TEXT NULL DEFAULT NULL,
+  `entities` JSON NULL DEFAULT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `bd_vuelos`.`flights`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd_vuelos`.`flights` (
+  `id` CHAR(36) NOT NULL DEFAULT uuid(),
+  `airline_id` CHAR(36) NULL DEFAULT NULL,
+  `flight_number` VARCHAR(20) NULL DEFAULT NULL,
+  `origin` VARCHAR(10) NOT NULL,
+  `destination` VARCHAR(10) NOT NULL,
+  `departure_dt` TIMESTAMP NOT NULL,
+  `arrival_dt` TIMESTAMP NOT NULL,
+  `duration_minutes` INT NULL DEFAULT NULL,
+  `price_cents` BIGINT NOT NULL,
+  `seats_total` INT NOT NULL,
+  `seats_available` INT NOT NULL,
+  `metadata` JSON NULL DEFAULT json_object(),
+  PRIMARY KEY (`id`),
+  INDEX `airline_id` (`airline_id` ASC) VISIBLE,
+  CONSTRAINT `flights_ibfk_1`
+    FOREIGN KEY (`airline_id`)
+    REFERENCES `bd_vuelos`.`airlines` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `bd_vuelos`.`reservations`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd_vuelos`.`reservations` (
+  `id` CHAR(36) NOT NULL DEFAULT uuid(),
+  `user_id` CHAR(36) NULL DEFAULT NULL,
+  `flight_id` CHAR(36) NULL DEFAULT NULL,
+  `passengers` JSON NOT NULL,
+  `status` VARCHAR(20) NULL DEFAULT 'PENDING',
+  `price_paid_cents` BIGINT NULL DEFAULT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `flight_id` (`flight_id` ASC) VISIBLE,
+  CONSTRAINT `reservations_ibfk_1`
+    FOREIGN KEY (`flight_id`)
+    REFERENCES `bd_vuelos`.`flights` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `bd_vuelos`.`search_logs`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd_vuelos`.`search_logs` (
+  `id` CHAR(36) NOT NULL DEFAULT uuid(),
+  `user_id` CHAR(36) NULL DEFAULT NULL,
+  `query` JSON NULL DEFAULT NULL,
+  `results_count` INT NULL DEFAULT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `bd_vuelos`.`usuarios`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd_vuelos`.`usuarios` (
+  `cedula` INT NOT NULL,
+  `nombre` VARCHAR(20) NULL DEFAULT NULL,
+  `ciudad` VARCHAR(20) NULL DEFAULT NULL,
+  `email` VARCHAR(30) NULL DEFAULT NULL,
+  `password_hash` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`cedula`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+USE `bd_1` ;
+
+-- -----------------------------------------------------
+-- Table `bd_1`.`adicionales`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd_1`.`adicionales` (
+  `idadicionales` INT NOT NULL,
+  `nom_adicionales` VARCHAR(45) NULL DEFAULT NULL,
+  `valor_adicionales` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`idadicionales`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `bd_1`.`clientes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd_1`.`clientes` (
+  `idclientes` INT NOT NULL,
+  `nom_cliente` VARCHAR(45) NULL DEFAULT NULL,
+  `direc_cion` VARCHAR(45) NULL DEFAULT NULL,
+  `ciu_dad` VARCHAR(45) NULL DEFAULT NULL,
+  `num_cliente` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`idclientes`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `bd_1`.`producto`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd_1`.`producto` (
+  `idproducto` INT NOT NULL,
+  `nom_producto` VARCHAR(45) NULL DEFAULT NULL,
+  `valor_producto` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`idproducto`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `bd_1`.`producto_has_adicionales`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd_1`.`producto_has_adicionales` (
+  `producto_idproducto` INT NOT NULL,
+  `adicionales_idadicionales` INT NOT NULL,
+  PRIMARY KEY (`producto_idproducto`, `adicionales_idadicionales`),
+  INDEX `fk_producto_has_adicionales_adicionales1_idx` (`adicionales_idadicionales` ASC) VISIBLE,
+  INDEX `fk_producto_has_adicionales_producto_idx` (`producto_idproducto` ASC) VISIBLE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `bd_1`.`producto_has_adicionales_has_clientes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd_1`.`producto_has_adicionales_has_clientes` (
+  `producto_has_adicionales_producto_idproducto` INT NOT NULL,
+  `producto_has_adicionales_adicionales_idadicionales` INT NOT NULL,
+  `clientes_idclientes` INT NOT NULL,
+  PRIMARY KEY (`producto_has_adicionales_producto_idproducto`, `producto_has_adicionales_adicionales_idadicionales`, `clientes_idclientes`),
+  INDEX `fk_producto_has_adicionales_has_clientes_clientes1_idx` (`clientes_idclientes` ASC) VISIBLE,
+  INDEX `fk_producto_has_adicionales_has_clientes_producto_has_adici_idx` (`producto_has_adicionales_producto_idproducto` ASC, `producto_has_adicionales_adicionales_idadicionales` ASC) VISIBLE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
